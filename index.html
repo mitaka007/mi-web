@@ -1,0 +1,217 @@
+
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <title>MASMASTERS - NAI Scientific Analysis</title>
+    
+    <!-- Librerías Externas -->
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/chartjs-plugin-zoom"></script>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
+    
+    <style>
+        :root { 
+            --bg: #0f172a; --card: #1e293b; --accent: #8b5cf6; 
+            --text: #f1f5f9; --secondary: #64748b; --danger: #ef4444; 
+        }
+        
+        body { 
+            font-family: 'Segoe UI', system-ui, sans-serif; 
+            background: var(--bg); color: var(--text); 
+            margin: 0; padding: 15px; overflow-x: hidden;
+        }
+
+        .container { max-width: 800px; margin: auto; }
+
+        /* Branding MASMASTERS */
+        .brand-header { 
+            display: flex; justify-content: space-between; align-items: center; 
+            margin-bottom: 20px; border-bottom: 2px solid var(--accent); padding-bottom: 10px; 
+        }
+        .brand-name { font-size: 1.6em; font-weight: 900; letter-spacing: 1px; }
+        .brand-name span { color: var(--accent); }
+
+        /* Botón de Sincronización */
+        .btn-sync { 
+            background: var(--accent); color: white; width: 100%; 
+            padding: 18px; border: none; border-radius: 15px; 
+            font-size: 1.1em; font-weight: bold; cursor: pointer;
+            box-shadow: 0 4px 15px rgba(139, 92, 246, 0.3);
+            margin-bottom: 20px; transition: 0.3s;
+        }
+        .btn-sync:active { transform: scale(0.98); }
+
+        /* Panel de Inspección Punto a Punto */
+        .inspect-panel { 
+            background: linear-gradient(135deg, var(--accent), #6d28d9);
+            color: white; padding: 15px; border-radius: 15px; 
+            margin-bottom: 15px; display: none; 
+            grid-template-columns: 1fr 1fr; gap: 10px;
+            animation: fadeIn 0.4s;
+        }
+
+        /* Contenedor del Gráfico */
+        #chartWrapper { 
+            background: var(--card); padding: 15px; border-radius: 20px; 
+            display: none; margin-bottom: 20px; box-shadow: 0 10px 30px rgba(0,0,0,0.5);
+        }
+
+        /* Lista de Sesiones Históricas */
+        .session-card {
+            background: var(--card); border-radius: 12px; padding: 15px; margin-bottom: 10px;
+            display: flex; justify-content: space-between; align-items: center; 
+            border-left: 5px solid var(--accent); cursor: pointer; transition: 0.2s;
+        }
+        .session-card:hover { background: #24334d; }
+
+        /* Aviso Legal Desplegable */
+        .privacy-box { 
+            background: #00000044; border-radius: 12px; margin-top: 40px; 
+            padding: 15px; font-size: 0.8em; color: var(--secondary); border: 1px solid #334155; 
+        }
+        .privacy-toggle { cursor: pointer; display: flex; align-items: center; gap: 8px; font-weight: bold; color: var(--text); opacity: 0.8; }
+        .privacy-content { display: none; margin-top: 10px; line-height: 1.5; border-top: 1px solid #334155; padding-top: 10px; text-align: justify; }
+
+        @keyframes fadeIn { from { opacity: 0; transform: translateY(-10px); } to { opacity: 1; transform: translateY(0); } }
+    </style>
+</head>
+<body>
+
+<div class="container">
+    <div class="brand-header">
+        <div class="brand-name">MAS<span>MASTERS</span></div>
+        <div style="font-size: 0.7em; opacity: 0.6; background: #334155; padding: 4px 10px; border-radius: 6px;">NAI SCIENTIFIC</div>
+    </div>
+
+    <!-- Acción Principal -->
+    <button class="btn-sync" onclick="startSync()">
+        <i class="fa-solid fa-unlock-keyhole"></i> CONECTAR Y DESCARGAR
+    </button>
+
+    <!-- Visualizador de Datos Seleccionados -->
+    <div id="inspect" class="inspect-panel">
+        <div><i class="fa-solid fa-clock"></i> <span id="insTime">-</span></div>
+        <div><i class="fa-solid fa-dna"></i> Fase: <span id="insFase">-</span></div>
+        <div><i class="fa-solid fa-gauge-high"></i> Mov: <span id="insMov">-</span></div>
+        <div><i class="fa-solid fa-wave-square"></i> Aud: <span id="insAud">-</span></div>
+    </div>
+
+    <!-- Área de Gráfico con Zoom -->
+    <div id="chartWrapper">
+        <canvas id="mainChart"></canvas>
+        <div style="display:flex; gap:10px; margin-top:15px;">
+            <button onclick="resetZoom()" style="flex:1; padding:12px; border-radius:10px; border:none; background:#475569; color:white; font-weight:bold;">RESET ZOOM</button>
+            <button onclick="closeSession()" style="flex:1; padding:12px; border-radius:10px; border:none; background:var(--danger); color:white; font-weight:bold;">CERRAR</button>
+        </div>
+    </div>
+
+    <!-- Historial -->
+    <div id="sessionList">
+        <h4 style="opacity:0.7; margin-left: 5px;">HISTORIAL DE SESIONES</h4>
+        <!-- Inyectado por JS -->
+    </div>
+
+    <!-- Aviso de Privacidad -->
+    <div class="privacy-box">
+        <div class="privacy-toggle" onclick="togglePrivacy()">
+            <i class="fa-solid fa-user-shield"></i> Protección de Datos y Anonimato
+            <i class="fa-solid fa-chevron-down" style="font-size: 0.8em; margin-left: auto;"></i>
+        </div>
+        <div id="privacyContent" class="privacy-content">
+            <b>Compromiso MASMASTERS:</b><br>
+            1. <b>Anonimato Acústico:</b> El audio original nunca se graba ni se transmite. Solo se procesa el valor energético (RMS) en el chip.<br>
+            2. <b>Cifrado BLE:</b> La conexión requiere el PIN de seguridad 261078, impidiendo accesos no autorizados.<br>
+            3. <b>Almacenamiento Local:</b> Los datos pertenecen al usuario y se guardan exclusivamente en este navegador.
+        </div>
+    </div>
+</div>
+
+<script>
+    let chart;
+    const FASES = ["Reposo", "Inicial", "Plateau", "Pre-Clímax", "Clímax", "Cooldown"];
+
+    // Cargar historial al iniciar
+    window.onload = renderHistory;
+
+    function renderHistory() {
+        const list = document.getElementById('sessionList');
+        const sessions = JSON.parse(localStorage.getItem('masmasters_data') || '{}');
+        list.innerHTML = '<h4 style="opacity:0.7; margin-left: 5px;">HISTORIAL DE SESIONES</h4>';
+        
+        Object.keys(sessions).reverse().forEach(id => {
+            const card = document.createElement('div');
+            card.className = 'session-card';
+            card.innerHTML = `
+                <div>
+                    <strong>Sesión ${new Date(parseInt(id)).toLocaleString()}</strong><br>
+                    <small style="opacity:0.6">${sessions[id].length} puntos de datos</small>
+                </div>
+                <i class="fa-solid fa-chevron-right" style="color:var(--accent)"></i>
+            `;
+            card.onclick = () => loadSession(id);
+            list.appendChild(card);
+        });
+    }
+
+    async function startSync() {
+        alert("Recuerde: Debe realizar 5 toques rápidos en el dispositivo MASMASTERS para activar el Bluetooth antes de conectar.");
+        // Aquí iría la lógica de Web Bluetooth vinculada al PIN 261078
+        // Por seguridad, el navegador solicitará el PIN automáticamente al intentar emparejar.
+    }
+
+    function loadSession(id) {
+        const sessions = JSON.parse(localStorage.getItem('masmasters_data') || '{}');
+        const data = sessions[id];
+        
+        document.getElementById('chartWrapper').style.display = 'block';
+        document.getElementById('inspect').style.display = 'grid';
+        
+        if(chart) chart.destroy();
+        
+        const ctx = document.getElementById('mainChart').getContext('2d');
+        chart = new Chart(ctx, {
+            type: 'line',
+            data: {
+                labels: data.map(d => new Date(d.time * 1000).toLocaleTimeString()),
+                datasets: [
+                    { label: 'Movimiento', data: data.map(d => d.motion), borderColor: '#8b5cf6', tension: 0.3, pointRadius: 2 },
+                    { label: 'Audio', data: data.map(d => d.audio), borderColor: '#ec4899', tension: 0.3, pointRadius: 2 }
+                ]
+            },
+            options: {
+                responsive: true,
+                interaction: { mode: 'index', intersect: false },
+                onClick: (e, items) => {
+                    if (items.length > 0) {
+                        const idx = items[0].index;
+                        const p = data[idx];
+                        document.getElementById('insTime').innerText = new Date(p.time * 1000).toLocaleTimeString();
+                        document.getElementById('insFase').innerText = FASES[p.fase] || "Desconocida";
+                        document.getElementById('insMov').innerText = p.motion.toFixed(1);
+                        document.getElementById('insAud').innerText = p.audio.toFixed(1);
+                    }
+                },
+                plugins: {
+                    zoom: { zoom: { wheel: { enabled: true }, pinch: { enabled: true }, mode: 'x' } }
+                }
+            }
+        });
+        window.scrollTo({ top: 100, behavior: 'smooth' });
+    }
+
+    function togglePrivacy() {
+        const content = document.getElementById('privacyContent');
+        content.style.display = content.style.display === 'block' ? 'none' : 'block';
+    }
+
+    function resetZoom() { if(chart) chart.resetZoom(); }
+    function closeSession() { 
+        document.getElementById('chartWrapper').style.display = 'none'; 
+        document.getElementById('inspect').style.display = 'none';
+    }
+</script>
+
+</body>
+</html>
