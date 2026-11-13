@@ -3,7 +3,11 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-<title>NAI — Monitor analítico (V2.12)</title>
+<title>Nai Monitor</title>
+<link rel="manifest" href="manifest.webmanifest">
+<meta name="theme-color" content="#0f172a">
+<link rel="icon" type="image/png" href="icon-192.png">
+<link rel="apple-touch-icon" href="icon-192.png">
 <script src="https://cdn.jsdelivr.net/npm/chart.js@4"></script>
 <script src="https://cdn.jsdelivr.net/npm/hammerjs@2.0.8"></script>
 <script src="https://cdn.jsdelivr.net/npm/chartjs-plugin-zoom@2"></script>
@@ -53,7 +57,7 @@ th:first-child,td:first-child{text-align:left}
 <body>
 
 <div class="row">
-  <h2>NAI — Monitor (V2.12)</h2>
+  <h2>Nai Monitor <small style="color:#94a3b8;font-weight:400">V2.13</small></h2>
   <span><span id="bat" class="status" style="display:none;margin-right:6px"></span><span id="st" class="status">Desconectado</span></span>
 </div>
 
@@ -336,6 +340,9 @@ function exportCSV(){
   a.href=URL.createObjectURL(new Blob([csv],{type:'text/csv'}));
   a.download='NAI_datos_'+new Date().toISOString().slice(0,10)+'.csv'; a.click();
 }
+
+// ---- App instalable: guarda los archivos para abrir sin internet ----
+if('serviceWorker' in navigator){ navigator.serviceWorker.register('sw.js').catch(()=>{}); }
 </script>
 </body>
 </html>
