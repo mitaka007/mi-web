@@ -1,6 +1,6 @@
 // Nai Monitor — guarda la app en el móvil para que abra sin internet.
 // Al publicar una versión nueva de la app, cambia el número de VERSION.
-const VERSION = 'nai-monitor-v5.1';
+const VERSION = 'nai-monitor-v5.2';
 const PROPIOS = ['./', './index.html', './manifest.webmanifest',
                  './icon-192.png', './icon-512.png', './icon-maskable-512.png'];
 const LIBRERIAS = ['https://cdn.jsdelivr.net/npm/chart.js@4',

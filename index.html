@@ -82,6 +82,22 @@ details.sub{margin-top:10px;border-top:1px solid #283548;padding-top:8px}
 details.sub>summary{font-size:.85em;color:var(--muted);font-weight:600}
 .sep{border:none;border-top:1px solid #283548;margin:14px 0}
 .titulo{font-weight:700;font-size:.95em}
+.btnAyuda{width:34px;height:34px;border-radius:50%;border:none;background:var(--card2);color:#fff;font-weight:800;font-size:1em;cursor:pointer;flex:none}
+#ayuda{position:fixed;inset:0;background:var(--bg);z-index:50;display:none;overflow-y:auto;-webkit-overflow-scrolling:touch}
+#ayuda .caja{max-width:640px;margin:0 auto;padding:14px 14px 40px}
+#ayuda .cab{position:sticky;top:0;background:var(--bg);padding:6px 0 10px;display:flex;justify-content:space-between;align-items:center;z-index:2}
+#ayuda details{background:var(--card);border-radius:12px;padding:10px 12px;margin:8px 0;scroll-margin-top:60px}
+#ayuda summary{cursor:pointer;font-weight:700;list-style:none}
+#ayuda summary::-webkit-details-marker{display:none}
+#ayuda summary::after{content:'▸';float:right;color:var(--muted)}
+#ayuda details[open] summary::after{content:'▾'}
+#ayuda .t{font-size:.88em;line-height:1.55;color:#cbd5e1}
+#ayuda .t b{color:var(--text)}
+#ayuda .t ul{padding-left:18px;margin:6px 0}
+#ayuda .t li{margin:3px 0}
+#ayuda table{font-size:.82em;margin:6px 0}
+#ayuda td,#ayuda th{text-align:left}
+.enlace{background:none;border:none;color:#c4b5fd;font-size:.78em;cursor:pointer;padding:0;text-decoration:underline}
 .aviso{position:absolute;inset:0;display:none;align-items:center;justify-content:center;color:var(--muted);font-size:.9em;text-align:center;pointer-events:none}
 .ses .pts{font-weight:700;color:var(--text);margin-left:6px}
 .ses .med{margin-right:6px}
@@ -91,8 +107,8 @@ details.sub>summary{font-size:.85em;color:var(--muted);font-weight:600}
 <body>
 
 <div class="row top">
-  <h2>Nai Monitor <small style="color:#94a3b8;font-weight:400">V5.1</small></h2>
-  <span class="chips"><span id="pulsoChip" class="status" style="display:none;background:#7f1d1d;color:#fecaca"></span><span id="bat" class="status" style="display:none"></span><span id="st" class="status">Desconectado</span></span>
+  <h2>Nai Monitor <small style="color:#94a3b8;font-weight:400">V5.2</small></h2>
+  <span class="chips"><button class="btnAyuda" onclick="abrirAyuda()" title="Ayuda">?</button><span id="pulsoChip" class="status" style="display:none;background:#7f1d1d;color:#fecaca"></span><span id="bat" class="status" style="display:none"></span><span id="st" class="status">Desconectado</span></span>
 </div>
 <div class="row" id="apRow" style="display:none;margin:0 2px 6px">
   <span class="lbl" style="margin:0">Aparato: <b id="apNom" style="color:#fff"></b> <span id="apId"></span></span>
@@ -116,7 +132,7 @@ details.sub>summary{font-size:.85em;color:var(--muted);font-weight:600}
     <label class="chk pul" id="pulLbl"><input type="checkbox" id="vPulChk" checked onchange="cambiarSeries()">Pulso</label>
   </div>
   <div class="ch grande vacio"><canvas id="chAll"></canvas><div id="sinSeries" class="aviso">Marca al menos una serie para ver la gráfica</div><span id="cora" class="cora" title="Se parece mucho a una actividad sexual">♥</span></div>
-  <div class="lbl">Pellizca para ampliar, arrastra para moverte. Zona ámbar: clímax estimado.</div>
+  <div class="lbl">Pellizca para ampliar, arrastra para moverte. Zona ámbar: clímax estimado. <button class="enlace" onclick="abrirAyuda('a-datos')">¿Cómo leer los datos?</button></div>
   <div class="grid">
     <div class="tile"><span id="mDur" class="v">00:00</span><span class="l">Duración</span></div>
     <div class="tile"><span id="mClx" class="v">—</span><span class="l">Clímax est.</span></div>
@@ -155,6 +171,7 @@ details.sub>summary{font-size:.85em;color:var(--muted);font-weight:600}
 <!-- ===== Ajustes y diagnóstico (plegado) ===== -->
 <details class="card plegable">
   <summary>⚙ Ajustes y diagnóstico</summary>
+  <div style="margin-top:6px"><button class="enlace" onclick="abrirAyuda('a-ajustes')">Qué hace cada ajuste</button></div>
 
   <div class="row" style="margin-top:8px"><span class="lbl" style="margin:0">Nombre del aparato conectado</span><button class="mini" onclick="renombrar()">Cambiar nombre</button></div>
   <div class="hint">El aparato es visible en reposo y durante los primeros segundos de movimiento. La primera vez el móvil pedirá el PIN de emparejamiento.</div>
@@ -220,6 +237,128 @@ details.sub>summary{font-size:.85em;color:var(--muted);font-weight:600}
   <p><b>Responsable y reclamaciones.</b> Responsable: [NOMBRE Y CONTACTO DEL RESPONSABLE]. Puedes presentar una reclamación ante la Agencia Española de Protección de Datos (www.aepd.es).</p>
 </details>
 
+
+<!-- ===================================================================
+     AYUDA. Se actualiza con cada versión de la app (ver «Novedades»).
+     =================================================================== -->
+<div id="ayuda">
+ <div class="caja">
+  <div class="cab"><b>Ayuda · Nai Monitor <span id="ayVer"></span></b><button class="mini" onclick="cerrarAyuda()">✕ Cerrar</button></div>
+
+  <details id="a-inicio" open><summary>1. Primeros pasos</summary><div class="t">
+   <ul>
+    <li><b>Abre la app en Chrome</b> (Android o PC). Otros navegadores no tienen Bluetooth web.</li>
+    <li>Pulsa <b>CONECTAR DISPOSITIVO</b> y elige tu aparato (<b>NAI-XXXX</b>). La primera vez el móvil pide el <b>PIN</b> de emparejamiento.</li>
+    <li>Pulsa <b>⬇ Descargar</b>: las sesiones nuevas pasan al móvil y se guardan allí.</li>
+    <li>Toca una sesión del <b>Histórico</b> para verla en la gráfica.</li>
+    <li>Al terminar, pulsa <b>DESCONECTAR</b>: estar conectado gasta batería del aparato.</li>
+   </ul>
+   El aparato <b>graba solo</b>: se despierta al notar movimiento y se duerme al acabar. No hace falta tocarlo ni tener la app abierta.
+  </div></details>
+
+  <details id="a-botones"><summary>2. Botones de la parte de arriba</summary><div class="t">
+   <ul>
+    <li><b>? </b>: abre esta ayuda.</li>
+    <li><b>Etiquetas</b>: ♥ pulso en directo (si hay pulsómetro) · batería del aparato (o «Con USB» si se está cargando) · estado de la conexión.</li>
+    <li><b>Aparato</b>: nombre del aparato conectado y si usa memoria interna (unos 30 min) o externa (semanas).</li>
+    <li><b>CONECTAR / DESCONECTAR</b>: abre o cierra la conexión Bluetooth con el aparato. Al conectar se sincroniza la hora.</li>
+    <li><b>⬇ Descargar</b>: trae al móvil solo los registros nuevos. Con memoria interna, si está activado, vacía el aparato después (lo descargado queda en el móvil).</li>
+    <li><b>♥ Pulso</b>: conecta un reloj o banda de pecho que emita el pulso por Bluetooth estándar. En un Galaxy Watch abre antes la app «Heart for Bluetooth». La app debe quedar abierta durante la actividad; la pantalla se mantiene encendida.</li>
+    <li><b>CSV</b>: guarda en Descargas todo el historial del aparato en una hoja de cálculo.</li>
+   </ul>
+  </div></details>
+
+  <details id="a-grafica"><summary>3. La gráfica de la sesión</summary><div class="t">
+   <ul>
+    <li><b>Casillas de colores</b>: elige qué ver. <span style="color:#c4b5fd">Movimiento</span> (escala izquierda), <span style="color:#f9a8d4">Sonido</span> y <span style="color:#fca5a5">Pulso</span> (escalas derechas). Puedes ver una, dos o las tres. La casilla de pulso sale apagada si la sesión no tiene pulso.</li>
+    <li><b>Eje de abajo</b>: minutos:segundos desde el inicio, en tiempo real. Los huecos son pausas en las que el aparato no grabó.</li>
+    <li><b>Zoom</b>: pellizca con dos dedos. <b>Moverse</b>: arrastra. <b>Ver todo</b>: vuelve a la vista completa.</li>
+    <li><b>Toca la gráfica</b> para ver los valores de ese instante.</li>
+    <li><b>Zona ámbar y punto</b>: clímax estimado (±20 s).</li>
+    <li><b>♥ rojo arriba a la derecha</b>: la sesión se parece mucho a una actividad sexual (ver punto 6).</li>
+    <li><b>Registros de la sesión</b> (plegado, abajo): la tabla con todos los valores.</li>
+   </ul>
+  </div></details>
+
+  <details id="a-hist"><summary>4. Histórico y ranking</summary><div class="t">
+   <ul>
+    <li><b>Sesiones · Por semana · Duración media</b>: totales de todo lo guardado en el móvil para este aparato.</li>
+    <li><b>Recientes</b>: de la más nueva a la más antigua. <b>🏆 Ranking</b>: por puntuación (solo sesiones de 10 registros o más). <b>Más largas</b>: por duración.</li>
+    <li>Cada sesión muestra la fecha, ♥ si lo tiene, la duración y la <b>puntuación</b> (0-100).</li>
+    <li>Dos tramos separados por menos de 5 minutos cuentan como una sola sesión.</li>
+   </ul>
+  </div></details>
+
+  <details id="a-ajustes"><summary>5. Ajustes y diagnóstico</summary><div class="t">
+   Se envían al aparato al conectar y se guardan en el móvil, por separado para cada aparato.
+   <ul>
+    <li><b>Cubierto / Descubierto</b>: dónde está el aparato. Bajo el colchón la señal es más débil, así que «Cubierto» graba con menos movimiento y acepta menos intensidad.</li>
+    <li><b>Sensibilidad 1 a 5</b> (3 = normal): cuánto movimiento hace falta para empezar a grabar. Más sensible graba actividad más suave, pero también más giros en la cama.
+     <table><tr><th>Sensibilidad</th><th>Cubierto</th><th>Descubierto</th></tr>
+     <tr><td>1 · mínima</td><td>0,13</td><td>0,24</td></tr><tr><td>3 · normal</td><td>0,08</td><td>0,15</td></tr><tr><td>5 · máxima</td><td>0,07</td><td>0,10</td></tr></table></li>
+    <li><b>Filtro de voz / Sonido total</b>: con filtro, el aparato ignora golpes y roces graves y mide sobre todo la voz.</li>
+    <li><b>Vaciar el aparato / No vaciar</b>: solo con memoria interna (que se llena en ~30 min). Vacía el aparato tras una descarga completa y guardada.</li>
+    <li><b>Cambiar nombre</b>: pon un nombre tuyo al aparato conectado («Dormitorio», «Prototipo 2»…).</li>
+    <li><b>Autonomía de la batería</b>: estimación con las lecturas de cada conexión desde la última carga. Las primeras horas tras cargar exagera el consumo; es fiable a partir de 2-3 días.</li>
+    <li><b>Prueba en vivo (30 s)</b>: muestra en directo movimiento, sonido total, sonido filtrado y giro del aparato, y si grabaría con ese movimiento. No guarda nada. Sirve para ajustar la sensibilidad y comprobar el micro.</li>
+    <li><b>Borrar memoria del dispositivo</b>: borra lo grabado en el aparato (lo ya descargado sigue en el móvil).</li>
+    <li><b>Borrar historial del móvil</b>: borra del móvil todo lo de este aparato.</li>
+   </ul>
+  </div></details>
+
+  <details id="a-datos"><summary>6. Cómo interpretar los datos</summary><div class="t">
+   <b>Medidas</b>
+   <ul>
+    <li><b>Movimiento</b>: intensidad de la vibración cada ~2,4 s (sin la gravedad). Bajo el colchón la actividad real da <b>0,15-0,5</b>; encima, hasta ~1. Por encima de 1,5 de forma sostenida casi siempre es el aparato llevado encima (bolso, bolsillo) o en un coche.</li>
+    <li><b>Sonido</b>: energía de sonido sobre el ruido de fondo. <b>No es audio</b>: el aparato nunca graba ni envía sonido. Bajo el colchón suele ser roce; la app solo da por <b>válido</b> el sonido que destaca y que no explica el movimiento.</li>
+    <li><b>Pulso</b>: pulsaciones por minuto del reloj o la banda. No es una medida médica.</li>
+    <li><b>Ritmo/min</b>: cadencia del movimiento (cuántos vaivenes por minuto), no el pulso.</li>
+    <li><b>Regularidad</b> (0 a 1): lo constante que es ese ritmo. Más de 0,5 se considera regular.</li>
+   </ul>
+   <b>Puntuación (0-100)</b>: cuánto se parece la sesión a una actividad sexual.
+   <ul>
+    <li><b>Ritmo</b> hasta 35: parte del tiempo con ritmo regular.</li>
+    <li><b>Continuidad</b> hasta 25: parte del tiempo con actividad.</li>
+    <li><b>Duración</b> hasta 20: más puntos cuanto más dura (máximo a partir de 10 min).</li>
+    <li><b>Sonido</b> hasta 20: solo sonido válido.</li>
+    <li><b>Patrón humano</b>: suma por pausas de postura y pausas breves; resta mucho por vibración mecánica constante.</li>
+   </ul>
+   <b><span style="color:#ef4444">♥</span> Corazón</b>: 70 puntos o más, al menos 3 minutos, el aparato quieto en su sitio y una intensidad propia de su sitio.
+   <br><b>Fases</b> (relativas a cada sesión): Inicial, Meseta, Intensa, Clímax estimado y Relajación (lo que viene después del último tramo intenso).
+   <br><b>Clímax estimado</b>: el momento de más intensidad dentro de la actividad intensa, teniendo en cuenta movimiento, ritmo, picos de sonido válido y, si lo hay, el pulso. Es una estimación, no una detección segura.
+   <br><b>Posición del aparato</b>: si el aparato gira mucho respecto a su posición de reposo, se ha movido de su sitio (transportado) y la sesión no cuenta.
+   <br><b>Intensidad</b>: si el movimiento es demasiado fuerte para su sitio, la sesión no cuenta.
+   <br><br><b>Importante</b>: todo esto son estimaciones automáticas a partir de movimiento, nivel de sonido y pulso. No identifican a nadie ni sustituyen lo que digan las personas implicadas.
+  </div></details>
+
+  <details id="a-problemas"><summary>7. Problemas frecuentes</summary><div class="t">
+   <ul>
+    <li><b>No aparece el aparato</b>: muévelo un poco y conecta enseguida (durante 30 s emite rápido). Si sigue sin salir, apaga y enciende el Bluetooth del móvil. Si aún no sale, toca una vez RST con GND en la placa.</li>
+    <li><b>«GATT operation failed» o no conecta</b>: en Ajustes de Bluetooth del móvil olvida el aparato y vuelve a emparejarlo con el PIN.</li>
+    <li><b>La sesión sale a trozos</b>: la actividad es más suave que el umbral. Sube la sensibilidad o comprueba con la prueba en vivo si «grabaría».</li>
+    <li><b>No grabó nada</b>: memoria llena (descarga y vacía) o batería agotada (carga por USB y vuelve a conectar para poner la hora).</li>
+    <li><b>Fechas «sin fecha»</b>: el aparato se reinició y grabó antes de conectar con la app. Conecta tras cada carga o reinicio.</li>
+    <li><b>Pulso que se corta</b>: deja la app en primer plano y el móvil cerca; abre antes la app del reloj.</li>
+   </ul>
+  </div></details>
+
+  <details id="a-priv"><summary>8. Privacidad</summary><div class="t">
+   Los datos solo se guardan en el aparato y en este móvil; la app no los envía a ningún servidor. Úsalo solo con el conocimiento y el consentimiento de todas las personas cuya actividad se registra. Más detalle en «Protección de datos», al final de la página.
+  </div></details>
+
+  <details id="a-nov"><summary>9. Novedades de la versión</summary><div class="t">
+   <ul>
+    <li><b>V5.2</b>: esta ayuda (botón «?»).</li>
+    <li><b>V5.1</b>: ranking en el histórico; eje de tiempo real en la gráfica; aviso si no hay ninguna serie marcada.</li>
+    <li><b>V5.0</b>: una sola gráfica con casillas de movimiento, sonido y pulso; zona de clímax; ajustes plegados.</li>
+    <li><b>V4.6</b>: pulsómetro (reloj o banda de pecho).</li>
+    <li><b>V4.5</b>: sesiones unidas hasta 5 min; regla de intensidad impropia de su sitio.</li>
+    <li><b>V4.4</b>: detección de aparato transportado (necesita firmware V3.7 o posterior).</li>
+   </ul>
+   Firmware recomendado: <b>V3.9</b> o posterior.
+  </div></details>
+ </div>
+</div>
 <script>
 // ---- UUID: deben coincidir con el firmware ----
 const SVC ='19b10000-e8f2-537e-4f6c-d104768a1214';
@@ -240,6 +379,23 @@ let downloading=false, lastRx=0, malos=0, recibidos=[];
 const $=id=>document.getElementById(id);
 const say=t=>{$('msg').textContent=t;};
 const mmss=s=>String(Math.floor(s/60)).padStart(2,'0')+':'+String(Math.floor(s%60)).padStart(2,'0');
+
+// ---- Ayuda (mantenerla al día con cada versión: sección «Novedades») ----
+const APP_VER='V5.2';
+function abrirAyuda(sec){
+  $('ayVer').textContent=APP_VER;
+  $('ayuda').style.display='block';
+  if(sec){ const d=$(sec); if(d){ d.open=true; setTimeout(()=>d.scrollIntoView({block:'start'}),30); } }
+  else $('ayuda').scrollTop=0;
+  try{ history_push_ayuda(); }catch(e){}
+}
+function cerrarAyuda(){ $('ayuda').style.display='none'; }
+// El botón «atrás» del móvil cierra la ayuda en lugar de salir de la app
+function history_push_ayuda(){ window.history.pushState({ayuda:1},''); }
+window.addEventListener('popstate',()=>{ if($('ayuda').style.display==='block') cerrarAyuda(); });
+// Primera vez que se abre esta versión: aviso de novedades
+try{ if(localStorage.getItem('nai_ver_vista')!==APP_VER){ localStorage.setItem('nai_ver_vista',APP_VER);
+  setTimeout(()=>{ if(typeof say==='function') say('Novedad en '+APP_VER+': ayuda completa en el botón «?» de arriba.'); },800); } }catch(e){}
 
 // ---- Gráfica única: movimiento, sonido y pulso sincronizados por tiempo ----
 const COL={m:'#8b5cf6',a:'#ec4899',p:'#ef4444'};
